@@ -9,23 +9,9 @@ use ui::view::view;
 use iced::{Task, window};
 
 fn main() -> iced::Result {
+    // 移除了设置窗口图标的 .window() 调用
     iced::application("Jrip", update, view)
-        .theme(|_s| iced::Theme::KanagawaDragon)
-        .window(window::Settings {
-            icon: load_icon(),
-            ..Default::default()
-        })
         .run()
-}
-
-fn load_icon() -> Option<iced::window::Icon> {
-    // 从文件加载图标
-    if let Ok(icon_bytes) = std::fs::read("assets/icon.png") {
-        if let Ok(icon) = iced::window::Icon::from_file_data(&icon_bytes, None) {
-            return Some(icon);
-        }
-    }
-    None
 }
 
 fn update(state: &mut AppState, message: Message) -> Task<Message> {
