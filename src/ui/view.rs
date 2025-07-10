@@ -3,7 +3,7 @@
 
 use iced::{
     widget::{button, column, container, horizontal_rule, row, text, Space, Image, Stack}, 
-    Element, Length, Alignment, Color, Background, Border
+    Element, Length, Alignment, Color, Background, Border, ContentFit
 };
 use crate::app::{AppState, Message};
 use crate::ui::styles::{dir_button_style, primary_button_style, jrip_button_style, popup_container_style, main_container_style};
@@ -131,7 +131,8 @@ pub fn view(state: &AppState) -> Element<Message> {
         .push(
             Image::new("assets/background.jpg")
                 .width(Length::Fill)
-                .height(Length::Fill),
+                .height(Length::Fill)
+                .content_fit(ContentFit::Cover),
         )
         .push(ui_content)
         .into()
