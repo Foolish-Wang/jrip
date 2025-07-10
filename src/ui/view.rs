@@ -25,7 +25,7 @@ pub fn view(state: &AppState) -> Element<Message> {
                 state.current_dir.parent().unwrap_or(&state.current_dir).to_path_buf()
             )),
         Space::with_width(8),
-        button(text("✕ Exit").size(16))
+        button(text("Exit").size(16))
             .style(primary_button_style())
             .padding(8)
             .on_press(Message::Exit),
@@ -47,7 +47,7 @@ pub fn view(state: &AppState) -> Element<Message> {
                     .size(16)
                     .width(Fill)
                     .color(Color::WHITE),
-                button(text("✕").size(14))
+                button(text("X").size(14))
                     .style(primary_button_style())
                     .padding(4)
                     .on_press(Message::ClosePopup)
@@ -96,7 +96,7 @@ pub fn view(state: &AppState) -> Element<Message> {
                         .size(16)
                         .width(Fill)
                         .color(Color::from_rgb(0.8, 0.8, 0.8)),
-                    button(text("♪ Jrip").size(14))
+                    button(text("JRIP").size(14))
                         .style(jrip_button_style())
                         .padding(6)
                         .on_press(Message::JRIP(file_path))
