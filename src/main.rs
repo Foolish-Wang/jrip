@@ -1,4 +1,4 @@
-use std::{fs, path::{self, PathBuf}};
+use std::{fs, path::PathBuf, process::Command};
 
 use iced::{
     widget::{button, column, horizontal_rule, row, text}, window, Border, Element, Length::Fill, Shadow, Task
@@ -9,6 +9,7 @@ struct AppState {
     // Define the state of your application here
     current_dir:PathBuf,
     current_files:Vec<(String, bool)>,
+    popup:Option<String>,
 }
 
 impl Default for AppState {
@@ -18,6 +19,7 @@ impl Default for AppState {
         AppState {
             current_dir,
             current_files,
+            popup: None,
         }
     }
 }
@@ -26,6 +28,8 @@ impl Default for AppState {
 enum Message {
     Exit,
     CD(PathBuf), // Change Directory message
+    JRIP(PathBuf),
+    ClosePopup
 }
 
 fn update(state: &mut AppState, message:Message) -> Task<Message> {
@@ -35,6 +39,38 @@ fn update(state: &mut AppState, message:Message) -> Task<Message> {
             // Change the current directory and update the files
             state.current_dir = path_buf;
             state.current_files = get_files(&state.current_dir);
+            Task::none() // No task to run, just update the state
+        }
+        Message::JRIP(path_buf) => {
+            if let Some(parent) = path_buf.parent() {
+                // If the path has a parent, change to that directory
+                let mut new_file = parent.to_path_buf();
+                new_file.push("output.mp3");
+
+                if let Ok(output) = Command::new("ffmpeg")
+                    .args(["-i",
+                    path_buf.to_str().unwrap_or("/home"),
+                    "-q:a", "2", // sound quality
+                    "-y",
+                    new_file.to_str().unwrap_or("/home"),
+                    ]).status() {
+                    if output.success() {
+                       state.popup = Some(String::from("Audio Has Been Ripped!"));
+                    
+                    } else {
+                       state.popup = Some(String::from("Error Ripping!"));
+                        
+                    }
+                }
+            } else {
+                // If no parent, stay in the current directory
+                state.current_dir = path_buf.clone();
+            }
+            Task::none() // No task to run, just log the action
+        }
+        Message::ClosePopup => {
+            // Close the popup if it exists
+            state.popup = None;
             Task::none() // No task to run, just update the state
         }
     }
@@ -58,6 +94,15 @@ fn view(state: &AppState) ->Element<Message> {
 
     content = content.push(horizontal_rule(2));
 
+    if let Some(pat) = &state.popup{
+        
+        content = content.push(row![
+            text(pat).width(Fill),
+            button(text("close").size(24)).on_press(Message::ClosePopup)
+        ]);
+        content = content.push(horizontal_rule(2));
+    }
+    
     for file in &state.current_files{
         let file_name = text(&file.0).size(18);
         let mut file_path = state.current_dir.clone();
@@ -67,10 +112,13 @@ fn view(state: &AppState) ->Element<Message> {
             content = content.push(
                 button(file_name)
                     .style(dir_button_style())
-                    .on_press(Message::CD((file_path)))) // Change directory to the selected one
+                    .on_press(Message::CD(file_path))) // Change directory to the selected one
         } else {
             // If it's a file, just add the text
-            content = content.push(file_name);
+            content = content.push(row![file_name.width(Fill),
+                button(text("Jrip"))
+                .on_press(Message::JRIP(file_path))
+                ]);
         }
     }
     content.into()
