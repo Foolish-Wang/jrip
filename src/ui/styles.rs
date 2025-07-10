@@ -9,6 +9,16 @@ use iced::{
     Background,
 };
 
+// 主容器样式 - 增加透明度以显示背景
+pub fn main_container_style() -> impl Fn(&Theme) -> container::Style {
+    |_theme| container::Style {
+        background: Some(Background::Color(Color::from_rgba(0.05, 0.05, 0.08, 0.85))),
+        border: Border::default(),
+        text_color: Some(Color::WHITE),
+        shadow: iced::Shadow::default(),
+    }
+}
+
 // 目录按钮样式
 pub fn dir_button_style() -> impl Fn(&Theme, button::Status) -> button::Style {
     |_theme, status| button::Style {
@@ -85,15 +95,5 @@ pub fn popup_container_style() -> impl Fn(&Theme) -> container::Style {
             offset: iced::Vector::new(0.0, 4.0),
             blur_radius: 8.0,
         },
-    }
-}
-
-// 主容器样式
-pub fn main_container_style() -> impl Fn(&Theme) -> container::Style {
-    |_theme| container::Style {
-        background: Some(Background::Color(Color::from_rgb(0.05, 0.05, 0.08))),
-        border: Border::default(),
-        text_color: Some(Color::WHITE),
-        shadow: Shadow::default(),
     }
 }

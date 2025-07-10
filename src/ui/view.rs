@@ -2,7 +2,7 @@
 // It creates buttons, displays the current directory, and shows any popups.
 
 use iced::{
-    widget::{button, column, container, horizontal_rule, row, text, Space}, 
+    widget::{button, column, container, horizontal_rule, row, text, Space, image}, 
     Element, Length::Fill, Alignment, Color, Background, Border
 };
 use crate::app::{AppState, Message};
@@ -18,7 +18,7 @@ pub fn view(state: &AppState) -> Element<Message> {
             .size(20)
             .width(Fill)
             .color(Color::from_rgb(0.9, 0.9, 0.9)),
-        button(text("↑ Up").size(16))
+        button(text("^ Up").size(16))
             .style(primary_button_style())
             .padding(8)
             .on_press(Message::CD(
@@ -106,7 +106,7 @@ pub fn view(state: &AppState) -> Element<Message> {
                 .align_y(Alignment::Center)
             )
             .style(|_theme| container::Style {
-                background: Some(Background::Color(Color::from_rgb(0.08, 0.08, 0.12))),
+                background: Some(Background::Color(Color::from_rgba(0.08, 0.08, 0.12, 0.9))),
                 border: Border {
                     color: Color::TRANSPARENT,
                     width: 0.0,
@@ -121,10 +121,35 @@ pub fn view(state: &AppState) -> Element<Message> {
         }
     }
 
-    container(content)
-        .style(main_container_style())
+    // 创建背景容器
+    let background_container = container(content)
+        .style(background_container_style())
         .padding(8)
         .width(Fill)
-        .height(Fill)
-        .into()
+        .height(Fill);
+
+    background_container.into()
+}
+
+// 添加背景样式函数
+fn background_container_style() -> impl Fn(&iced::Theme) -> container::Style {
+    |_theme| {
+        // 尝试加载背景图片
+        if let Ok(_) = std::fs::metadata("assets/background.jpg") {
+            container::Style {
+                background: Some(Background::Color(Color::from_rgb(0.05, 0.05, 0.08))),
+                border: Border::default(),
+                text_color: Some(Color::WHITE),
+                shadow: iced::Shadow::default(),
+            }
+        } else {
+            // 如果图片不存在，使用渐变背景
+            container::Style {
+                background: Some(Background::Color(Color::from_rgb(0.05, 0.05, 0.08))),
+                border: Border::default(),
+                text_color: Some(Color::WHITE),
+                shadow: iced::Shadow::default(),
+            }
+        }
+    }
 }
